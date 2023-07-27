@@ -1,0 +1,59 @@
+{% extends 'bookproj/base.html' %}
+
+{% block content %}
+<style>
+    body {
+        background-image: url("https://cdn.shopify.com/s/files/1/0080/0984/2786/files/shutterstock_1181523733.jpg?v=1655221599");
+        background-size: 115%;
+    }
+</style>
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">
+        Let's go on a trip during the summer vacation!</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">Escape the heat and embark on an unforgettable adventure this summer. Discover the perfect
+            destination and indulge in a well-deserved break at our exceptional hotels. Whether you seek a tropical
+            paradise, a cultural exploration, or a thrilling city escape, we have the ideal accommodations to suit your
+            every need.
+
+            Immerse yourself in the beauty of sandy beaches, crystal-clear waters, and sun-kissed skies. Relax in
+            luxurious rooms that offer breathtaking views and unparalleled comfort. Unwind by the poolside, sip
+            refreshing cocktails, and bask in the serene ambiance of our summer oasis.
+
+            Our dedicated team is ready to cater to your every desire, ensuring a seamless and enjoyable stay. From
+            delectable dining options to exciting excursions, we have curated a selection of experiences that will
+            create cherished memories for you and your loved ones.
+
+            Don't miss out on this opportunity to create a summer vacation like no other. Book your dream getaway now
+            and let us take care of the rest. Your unforgettable summer adventure awaits!</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <button type="button" class="btn btn-primary btn-lg px-4 gap-3" onclick="redirectToSearch()">Start
+                reservation</button>
+            {% if user.is_authenticated %}
+            {% else %}
+            <button type="button" class="btn btn-outline-secondary btn-lg px-4"
+                onclick="redirectToLogin()">Login</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    function redirectToSearch() {
+        // リダイレクトしたいURLを指定してください
+        var url = "/searchPage";  // ここにリダイレクトしたいURLを記述
+
+        // リダイレクト処理
+        window.location.href = url;
+    }
+    function redirectToLogin() {
+        // リダイレクトしたいURLを指定してください
+        var url = "/login";  // ここにリダイレクトしたいURLを記述
+
+        // リダイレクト処理
+        window.location.href = url;
+    }
+</script>
+{% endblock %}

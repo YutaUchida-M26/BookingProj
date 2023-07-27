@@ -1,0 +1,223 @@
+{% extends 'bookproj/base.html' %}
+
+{% block content %}
+<style>
+    /* ここにカスタムのCSSスタイルを追加して、デザインを調整します */
+    body {
+        background-image: url("https://cdn.shopify.com/s/files/1/0080/0984/2786/files/shutterstock_1181523733.jpg?v=1655221599");
+        background-size: 115%;
+    }
+
+    /* 他のスタイルの定義を追加してデザインを調整します */
+    .section {
+        padding: 100px 0;
+    }
+
+    .section-center {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .booking-cta h1 {
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .booking-cta p {
+        font-size: 18px;
+    }
+
+    .booking-form {
+        padding: 20px;
+        background-color: #f7f7f7;
+        border-radius: 10px;
+        /* フォームの角を丸くする */
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-size: 16px;
+        font-weight: 600;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .submit-btn {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .submit-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .select-arrow {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+
+    /* フォームを左に配置するスタイルを追加 */
+    .booking-form-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    /* フォームのスタイルを調整 */
+    .booking-form-container .col-md-4 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    /* テキストのスタイルを調整 */
+    .booking-form-container .col-md-7 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        text-align: left;
+    }
+
+    /* テキストを上下中央に配置するスタイルを追加 */
+    .booking-cta {
+        width: 100%;
+        /* 幅を100%に設定 */
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* オプション: テキストの行間を調整 */
+    .booking-cta h1,
+    .booking-cta p {
+        margin: 0;
+    }
+</style>
+
+<div id="booking" class="section">
+    <div class="section-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="booking-form">
+                        <!-- フォームのaction属性を指定し、methodをPOSTに設定 -->
+                        <form action="{% url 'hotelList' %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <span class="form-label">City</span>
+                                <select class="form-control" name="city">
+                                    {% for city in cities %}
+                                    <option value="{{ city.id }}">{{ city.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="select-arrow"></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <span class="form-label">Check In</span>
+                                        <!-- id属性を追加し、JavaScriptから要素にアクセスするためのIDを設定 -->
+                                        <input id="check-in-input" class="form-control" type="date" name="check_in"
+                                            required="">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <span class="form-label">Check out</span>
+                                        <!-- id属性を追加し、JavaScriptから要素にアクセスするためのIDを設定 -->
+                                        <input id="check-out-input" class="form-control" type="date" name="check_out"
+                                            required="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <span class="form-label">Room type</span>
+                                <select class="form-control" name="room_type">
+                                    {% for room_type in room_types %}
+                                    <option value="{{ room_type.id }}">{{ room_type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="select-arrow"></span>
+                            </div>
+                            <div class="form-btn">
+                                <button type="submit" class="submit-btn">Check availability</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="booking-cta">
+                        <h1>Make your reservation!</h1>
+                        <p>Select the area you want to stay in, check-in/check-out date and time, and room type to see
+                            a list of hotels that suit you!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    // ページが読み込まれたときに実行される関数
+    window.onload = function () {
+        // 今日の日付を取得
+        var today = new Date().toISOString().split('T')[0];
+        // 2週間後の日付を取得
+        var twoWeeksLater = new Date();
+        twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+        var maxDate = twoWeeksLater.toISOString().split('T')[0];
+
+        // チェックイン日の入力フィールドに最小値を設定
+        document.getElementById("check-in-input").setAttribute("min", today);
+        document.getElementById("check-in-input").setAttribute("max", maxDate);
+        // チェックアウト日の入力フィールドに最小値を設定
+        document.getElementById("check-out-input").setAttribute("min", today);
+        // チェックアウト日の入力フィールドに最大値を設定
+        document.getElementById("check-out-input").setAttribute("max", maxDate);
+
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+            return `${year}-${month}-${day}`;
+        };
+
+        // チェックイン日が選択されたときの処理
+        document.getElementById("check-in-input").addEventListener("change", function () {
+            // チェックイン日の選択値を取得
+            //var checkInDate = this.value;
+            console.log(this.value);
+            const checkInDate = new Date(this.value);
+            // 1日を加算
+            checkInDate.setDate(checkInDate.getDate() + 1);
+            // 新しい日付を取得
+            const newDate = formatDate(checkInDate);
+            //checkOutInput.min = newDate;
+            // チェックアウト日の最小値をチェックイン日に合わせる
+            document.getElementById("check-out-input").setAttribute("min", newDate);
+        });
+    };
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'bookproj/base.html' %}
+
+{% block content %}
+<div class="section">
+    <div class="section-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center"> <!-- text-centerを追加 -->
+                    <h2 class="mb-4">Available Hotels</h2>
+                    {% if hotels %}
+                    {% regroup hotels by hotel as hotel_group %}
+                    <ul class="list-group">
+                        {% for group in hotel_group %}
+                        {% regroup group.list by room_type as room_type_group %}
+                        {% for room_type_group in room_type_group %}
+                        <li class="list-group-item">
+                            <h3>{{ group.grouper.name }}</h3>
+                            <a class="btn btn-primary"
+                                href="{% url 'reservation' group.grouper.id room_type_group.grouper.id %}?check_in_date={{ check_in_date }}&check_out_date={{ check_out_date }}">Reserve</a>
+                            <p>City: {{ group.grouper.city.name }}</p>
+                            <p>Room Type: {{ room_type_group.grouper.name }}</p>
+                            <ul class="list-group">
+                                {% for item in room_type_group.list %}
+                                <li class="list-group-item">Date: {{ item.date }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-center mt-4">No hotels available with the selected criteria.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

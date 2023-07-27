@@ -1,0 +1,130 @@
+{% extends 'bookproj/base.html' %}
+
+{% block content %}
+<div class="section">
+    <div class="section-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <h2 class="text-center">Make a Reservation</h2>
+                    {% if not user.is_authenticated %}
+                    <form action="{% url 'reservation' hotel.id room_type.id %}" method="post" id="reservation-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="check_in">Check In</label>
+                            <input type="date" class="form-control" name="check_in" value="{{ check_in_date }}"
+                                id="check-in-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="check_out">Check Out</label>
+                            <input type="date" class="form-control" name="check_out" value="{{ check_out_date }}"
+                                id="check-out-input" required>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Reserve</button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <form action="{% url 'reservation' hotel.id room_type.id %}" method="post" id="reservation-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="check_in">Check In</label>
+                            <input type="date" class="form-control" name="check_in" value="{{ check_in_date }}"
+                                id="check-in-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="check_out">Check Out</label>
+                            <input type="date" class="form-control" name="check_out" value="{{ check_out_date }}"
+                                id="check-out-input" required>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Reserve</button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkInInput = document.getElementById("check-in-input");
+        const checkOutInput = document.getElementById("check-out-input");
+        const form = document.getElementById("reservation-form");
+
+        // テンプレート変数をJavaScript変数に変換
+        const availableDatesJson = '{{ available_dates_json|safe }}';
+        const availableDates = JSON.parse(availableDatesJson);
+
+        const today = new Date();
+        const twoWeeksFromToday = new Date(today.getTime() + (14 * 24 * 60 * 60 * 1000));
+
+        // HTML5 date input requires the date string to be in the format 'yyyy-MM-dd'.
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+            return `${year}-${month}-${day}`;
+        };
+
+        // Set the minimum and maximum attributes of the date inputs.
+        checkInInput.setAttribute("min", formatDate(today));
+        checkInInput.setAttribute("max", formatDate(twoWeeksFromToday));
+        checkOutInput.setAttribute("min", formatDate(today));
+        checkOutInput.setAttribute("max", formatDate(twoWeeksFromToday));
+
+        console.log(checkInInput, checkOutInput);
+
+        // Disable dates that are not in the availableDates array.
+        const disableUnavailableDates = (input) => {
+            input.addEventListener("input", function () {
+                const selectedDate = new Date(input.value);
+                const isDateAvailable = availableDates.some(date => new Date(date).getTime() === selectedDate.getTime());
+                if (!isDateAvailable) {
+                    input.setCustomValidity("Please select an available date.");
+                } else {
+                    input.setCustomValidity("");
+                }
+            });
+        };
+
+        disableUnavailableDates(checkInInput);
+        disableUnavailableDates(checkOutInput);
+
+
+
+        // Prevent selecting an unavailable check-out date that is before the check-in date.
+        checkInInput.addEventListener("change", function () {
+            console.log(checkInInput.value);
+            const checkInDate = new Date(checkInInput.value);
+            // 1日を加算
+            checkInDate.setDate(checkInDate.getDate() + 1);
+            // 新しい日付を取得
+            const newDate = formatDate(checkInDate);
+            checkOutInput.min = newDate;
+        });
+
+        // Prevent submitting the form if the selected check-out date is before the check-in date.
+        form.addEventListener("submit", function (event) {
+            const checkInDate = new Date(checkInInput.value);
+            const checkOutDate = new Date(checkOutInput.value);
+            if (checkOutDate < checkInDate) {
+                event.preventDefault();
+                alert("Check-out date cannot be before check-in date.");
+            }
+        });
+    });
+</script>
+{% endblock %}
