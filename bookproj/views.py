@@ -86,6 +86,10 @@ def hotelList(request):
             "check_in_date": None,
             "check_out_date": None,
         }
+        error_message = request.session.pop("error_message", None)
+        context["error_message"] = error_message
+        success_message = request.session.pop("success_message", None)
+        context["success_message"] = success_message
 
     return render(request, "bookproj/hotelList.html", context)
 
@@ -157,9 +161,11 @@ def reservation(request, hotel_id, room_type_id):
                 room_availability.save()
 
             messages.success(request, "Reservation completed successfully.")
+            request.session["success_message"] = "Reservation completed successfully."
             return redirect("hotelList")
         else:
             messages.error(request, "Failed to Reservation.")
+            request.session["error_message"] = "Failed to Reservation."
             return redirect("hotelList")
 
     if request.method == "GET":
