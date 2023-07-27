@@ -52,7 +52,3 @@ The application uses the following Django models:
 - `Hotel`: Represents a hotel with its name, location, etc.
 - `HotelAvailability`: Represents the availability of rooms in hotels for specific dates.
 - `Reservation`: Represents a user's reservation with details like the hotel, room type, check-in, and check-out dates.
-
-Note: The actual model fields and their relationships are not detailed in the provided code but are essential for the application to function correctly.
-
-This Django hotel booking application provides a straightforward way for users to search for hotels and make reservations. Further improvements and additional features can be added based on specific business requirements.
