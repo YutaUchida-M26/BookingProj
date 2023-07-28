@@ -43,8 +43,7 @@ def hotelList(request):
         hotels = HotelAvailability.objects.filter(
             city_id=city_id,
             room_type_id=room_type_id,
-            date__gte=check_in_date,
-            date__lt=check_out_date,  # チェックアウトの日は含まないように変更
+            date=check_in_date,
             room_count__gt=0,  # room_countが0より大きいことを条件に追加
         ).order_by("hotel__name", "hotel__city__name", "room_type__name", "date")
 
